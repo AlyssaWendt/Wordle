@@ -1,2 +1,0 @@
-# Wordle
-Wordle clone
