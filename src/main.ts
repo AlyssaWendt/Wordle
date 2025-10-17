@@ -33,8 +33,9 @@ function initializeApp(): void {
   // Initialize the game
   const game = new Game(gameContainer)
   
-  // Optional: Add any global event listeners or setup
-  console.log('Wordle game initialized!')
+  // Game is now running - no need to store reference
+  // The game handles its own event listeners and state
+  console.log('Wordle game initialized!', { game })
 }
 
 // ===== APP STARTUP =====
