@@ -146,10 +146,8 @@ export class Keyboard {
     }
 
     private updateKeyElementStatus(keyElement: HTMLElement, status: TileStatus): void {
-        // Remove existing status classes
         keyElement.classList.remove('correct', 'present', 'absent', 'empty')
         
-        // Add new status class
         if (status !== 'empty') {
             keyElement.classList.add(status)
         }

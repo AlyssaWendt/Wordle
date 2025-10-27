@@ -1,6 +1,7 @@
 import { Board } from './Board'
 import { Keyboard } from './Keyboard'
 import type { TileData, TileStatus } from './Tile'
+import { generateWordleWord } from '../utils/wordGenerator'
 
 // ===== TYPES =====
 type GameStatus = 'playing' | 'won' | 'lost'
@@ -24,7 +25,6 @@ export class Game {
     private keyboard: Keyboard
 
     constructor(container: HTMLElement) {
-        // Set up initial state
         this.state = {
             currentGuess: '',
             guesses: [],
@@ -32,45 +32,38 @@ export class Game {
             currentRow: 0,
             targetWord: 'DONUT' // Temporary test word - will come from OpenAI later
         }
-        
-        // Create board and keyboard instances
+
+        this.initializeTargetWord() // Async call to set target word
         this.board = new Board(container)
         this.keyboard = new Keyboard(container, (key) => this.handleKeyPress(key))
         
-        // Set up event listeners for physical keyboard
         window.addEventListener('keydown', (e) => this.handleKeyPress(e.key))
         
-        // Initial render
         this.updateBoard()
     }
 
 
 
     public handleKeyPress(key: string): void {
-        // Only process if game is still playing
         if (this.state.gameStatus !== 'playing') return
         const normalizedKey = key.toUpperCase()
 
-        // Handle letter A-Z
         if (/^[A-Z]$/.test(normalizedKey)) {
             this.addLetter(normalizedKey)
             console.log(`Added letter: ${normalizedKey}, Current guess: ${this.state.currentGuess}`)
             return
         }
-        // Handle Enter (use original key, not normalized)
         if (key === 'Enter') {
             this.submitGuess()
             console.log('Submitted guess:', this.state.currentGuess)
             return
         }
-        // Handle Backspace (use original key, not normalized)
         if (key === 'Backspace') {
             this.removeLetter()
             console.log('Removed letter, Current guess:', this.state.currentGuess)
             return
         }
         
-        // Debug: log unhandled keys
         console.log('Unhandled key:', key, 'normalized:', normalizedKey)
     }
 
@@ -80,16 +73,33 @@ export class Game {
         this.updateBoard()
     }
 
-    public reset(): void {
-        this.state = {
-            currentGuess: '',
-            guesses: [],
-            gameStatus: 'playing',
-            currentRow: 0,
-            targetWord: 'DONUT' // Temporary test word - will come from OpenAI later
+    public async reset(): Promise<void> {
+        console.log('🔄 Starting new game...')
+        try {
+            const newWord = await generateWordleWord()
+            this.state = {
+                currentGuess: '',
+                guesses: [],
+                gameStatus: 'playing',
+                currentRow: 0,
+                targetWord: newWord
+            }
+            this.board.reset()
+            this.keyboard.reset()
+            console.log('✅ New game started with word:', newWord)
+        } catch (error) {
+            // Reset with fallback word
+            this.state = {
+                currentGuess: '',
+                guesses: [],
+                gameStatus: 'playing',
+                currentRow: 0,
+                targetWord: 'DONUT'
+            }
+            
+            this.board.reset()
+            this.keyboard.reset()
         }
-        this.board.reset()
-        this.keyboard.reset()
     }
 
     public submitGuess(): void {
@@ -120,17 +130,14 @@ export class Game {
         
         console.log('Created tiles:', guessTiles)
 
-        // Add to guesses array
         this.state.guesses.push(guessTiles)
         console.log('Updated guesses array:', this.state.guesses)
         
-        // IMMEDIATELY update the just-submitted row with colors
         for (let col = 0; col < guessTiles.length; col++) {
             this.board.updateTile(this.state.currentRow, col, guessTiles[col].letter, guessTiles[col].status)
         }
         console.log('Applied colors to current row immediately')
         
-        // Update keyboard with new letter statuses
         this.updateKeyboard()
         console.log('Updated keyboard colors')
 
@@ -138,15 +145,14 @@ export class Game {
             console.log('🎉 WIN CONDITION MET!')
             this.state.gameStatus = 'won'  
             alert('Congratulations! You won!')
-            return // Don't continue if won
+            return
         } else if (this.checkLoseCondition()) {
             console.log('💀 LOSE CONDITION MET!')
             this.state.gameStatus = 'lost'
             alert(`Game Over! The word was ${this.state.targetWord}`)
-            return // Don't continue if lost
+            return
         } 
         
-        // Only continue to next row if game is still playing
         console.log('Game continues...')
         this.state.currentRow++
         this.state.currentGuess = ''
@@ -154,6 +160,10 @@ export class Game {
         console.log('Reset current guess:', this.state.currentGuess) 
         
         console.log('=== END SUBMIT GUESS ===\n')
+    }
+
+    public async startNewGame(): Promise<void> {
+        await this.reset()
     }
 
     // ===== PUBLIC METHODS =====
@@ -166,6 +176,17 @@ export class Game {
     }
 
     // ===== PRIVATE METHODS =====
+    private async initializeTargetWord(): Promise<void> {
+        try {
+            const word = await generateWordleWord()
+            this.state.targetWord = word
+            console.log('Generated target word from OpenAI:', word)
+        } catch (error) {
+            console.error('Error generating word from OpenAI:', error)
+            // Keep 'DONUT' as fallback
+        }
+    }
+
     private updateBoard(): void {
         this.board.render(
             this.state.guesses, 
@@ -175,7 +196,6 @@ export class Game {
     }
 
     private updateKeyboard(): void {
-        // Update keyboard with letter statuses from the last guess
         const lastGuess = this.state.guesses[this.state.guesses.length - 1]
         if (lastGuess) {
             const keyUpdates = lastGuess.map(tile => ({
@@ -197,7 +217,6 @@ export class Game {
         
         console.log('Initial result (all absent):', result)
         
-        // First pass: mark correct letters
         console.log('FIRST PASS - Finding exact matches:')
         for (let i = 0; i < WORD_LENGTH; i++) {
             if (guessArray[i] === targetArray[i]) {
@@ -215,7 +234,6 @@ export class Game {
         console.log('  Remaining target letters:', targetArray)
         console.log('  Remaining guess letters:', guessArray)
         
-        // Second pass: mark present letters
         console.log('SECOND PASS - Finding wrong position matches:')
         for (let i = 0; i < WORD_LENGTH; i++) {
             if (guessArray[i] !== '*') {

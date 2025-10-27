@@ -60,7 +60,6 @@ export class Board {
     // ===== PUBLIC METHODS =====
     public render(guesses: TileData[][], currentGuess: string = '', currentRow: number = 0): void {
         
-        // Render completed guesses
         for (let row = 0; row < guesses.length; row++) {
             const guess = guesses[row]
             for (let col = 0; col < guess.length; col++) {
@@ -69,7 +68,6 @@ export class Board {
             }
         }
 
-        // Render current guess row
         if (currentGuess && currentRow < BOARD_ROWS) {
             for (let col = 0; col < BOARD_COLS; col++) {
                 const letter = currentGuess[col] || ''
@@ -77,22 +75,18 @@ export class Board {
             }
         }
 
-        // Clear remaining tiles in current row
         for (let col = currentGuess.length; col < BOARD_COLS; col++) {
             this.updateTile(currentRow, col, '', 'empty')
         }
     }
 
-    // Add a more efficient method for just updating the current guess
     public renderCurrentGuess(currentGuess: string, currentRow: number): void {
         if (currentRow >= BOARD_ROWS) return
         
-        // Clear the current row
         for (let col = 0; col < BOARD_COLS; col++) {
             this.updateTile(currentRow, col, '', 'empty')
         }
         
-        // Fill in the current guess letters
         for (let col = 0; col < currentGuess.length && col < BOARD_COLS; col++) {
             const letter = currentGuess[col]
             this.updateTile(currentRow, col, letter, 'empty')

@@ -9,7 +9,6 @@ function init(): void {
     throw new Error('App container not found')
   }
 
-  // Set up the basic HTML structure
   appContainer.innerHTML = `
     <div class="wordle-app">
       <header class="header">
@@ -23,23 +22,18 @@ function init(): void {
     </div>
   `
 
-  // Get the game container
   const gameContainer = document.querySelector<HTMLDivElement>('#game-container')
   
   if (!gameContainer) {
     throw new Error('Game container not found')
   }
 
-  // Initialize the game
   const game = new Game(gameContainer)
   
-  // Game is now running - no need to store reference
-  // The game handles its own event listeners and state
   console.log('Wordle game initialized!', { game })
 }
 
 // ===== APP STARTUP =====
 document.addEventListener('DOMContentLoaded', init)
 
-// Export for potential future use
 export { init }

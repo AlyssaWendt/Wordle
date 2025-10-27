@@ -11,12 +11,16 @@
 		"format:check": "prettier --check ."
 	},
 	"devDependencies": {
+		"@vercel/node": "^5.5.0",
 		"prettier": "^3.6.2",
 		"sass": "^1.93.2",
 		"typescript": "~5.9.3",
 		"vite": "^7.1.7"
 	},
 	"dependencies": {
-		"openai": "^6.4.0"
+		"cors": "^2.8.5",
+		"dotenv": "^17.2.3",
+		"express": "^5.1.0",
+		"openai": "^6.7.0"
 	}
 }
