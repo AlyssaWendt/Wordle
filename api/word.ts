@@ -43,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     console.log('📡 Making OpenAI API request...')
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-5-nano',
       messages: [{
         role: 'user',
         content: 'Generate exactly one random 5-letter English word that would be good for Wordle. Respond with only the word, no other text.'
