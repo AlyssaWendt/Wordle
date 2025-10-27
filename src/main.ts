@@ -1,8 +1,8 @@
 import { Game } from './components/Game'
-//import './styles/main.scss'
+import './styles/main.scss'
 
 // ===== APP INITIALIZATION =====
-function initializeApp(): void {
+function init(): void {
   const appContainer = document.querySelector<HTMLDivElement>('#app')
   
   if (!appContainer) {
@@ -39,7 +39,7 @@ function initializeApp(): void {
 }
 
 // ===== APP STARTUP =====
-document.addEventListener('DOMContentLoaded', initializeApp)
+document.addEventListener('DOMContentLoaded', init)
 
 // Export for potential future use
-export { initializeApp }
+export { init }

@@ -120,28 +120,39 @@ export class Game {
         
         console.log('Created tiles:', guessTiles)
 
+        // Add to guesses array
         this.state.guesses.push(guessTiles)
         console.log('Updated guesses array:', this.state.guesses)
         
-        this.updateBoard()
+        // IMMEDIATELY update the just-submitted row with colors
+        for (let col = 0; col < guessTiles.length; col++) {
+            this.board.updateTile(this.state.currentRow, col, guessTiles[col].letter, guessTiles[col].status)
+        }
+        console.log('Applied colors to current row immediately')
+        
+        // Update keyboard with new letter statuses
         this.updateKeyboard()
-        console.log('Updated board and keyboard')
+        console.log('Updated keyboard colors')
 
         if (this.checkWinCondition()) {
             console.log('🎉 WIN CONDITION MET!')
             this.state.gameStatus = 'won'  
             alert('Congratulations! You won!')
+            return // Don't continue if won
         } else if (this.checkLoseCondition()) {
             console.log('💀 LOSE CONDITION MET!')
             this.state.gameStatus = 'lost'
             alert(`Game Over! The word was ${this.state.targetWord}`)
-        } else {
-            console.log('Game continues...')
-            this.state.currentRow++
-            this.state.currentGuess = ''
-            console.log('New current row:', this.state.currentRow)
-            console.log('Reset current guess:', this.state.currentGuess)
-        }
+            return // Don't continue if lost
+        } 
+        
+        // Only continue to next row if game is still playing
+        console.log('Game continues...')
+        this.state.currentRow++
+        this.state.currentGuess = ''
+        console.log('New current row:', this.state.currentRow)
+        console.log('Reset current guess:', this.state.currentGuess) 
+        
         console.log('=== END SUBMIT GUESS ===\n')
     }
 
@@ -151,7 +162,7 @@ export class Game {
         if (this.state.gameStatus !== 'playing') return
         
         this.state.currentGuess += letter.toUpperCase()
-        this.updateBoard()
+        this.board.renderCurrentGuess(this.state.currentGuess, this.state.currentRow)
     }
 
     // ===== PRIVATE METHODS =====
@@ -230,7 +241,11 @@ export class Game {
     }
 
     private checkWinCondition(): boolean {
-        return this.state.currentGuess.toUpperCase() === this.state.targetWord.toUpperCase()
+        const lastGuess = this.state.guesses[this.state.guesses.length - 1]
+        if (!lastGuess) return false
+
+        const guessWord = lastGuess.map(tile => tile.letter).join('')
+        return guessWord === this.state.targetWord.toUpperCase()
     }
 
     private checkLoseCondition(): boolean {
