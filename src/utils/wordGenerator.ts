@@ -9,12 +9,13 @@ export async function generateWordleWord(): Promise<string> {
       },
     })
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`)
-    }
-
     const data = await response.json()
-    console.log('API response:', data)
+    console.log('Full API response:', data) // This will show the error details
+
+    if (!response.ok) {
+      console.error('API Error Details:', data)
+      throw new Error(`HTTP ${response.status}: ${data.error || 'Unknown error'}`)
+    }
     
     if (data.word && data.word.length === 5 && /^[A-Z]+$/.test(data.word)) {
       console.log('✅ Got valid word from API:', data.word)
@@ -31,7 +32,7 @@ export async function generateWordleWord(): Promise<string> {
 
 function getRandomFallbackWord(): string {
   const fallbackWords = [
-    'SLATE', 'CRANE', 'ADIEU', 'AUDIO', 'HOUSE', 
+    'SLATE', 'CRANE', 'ABORT', 'AUDIO', 'HOUSE', 
     'MOUSE', 'PLANT', 'BREAD', 'CHAIR', 'DANCE',
     'LIGHT', 'SOUND', 'WATER', 'EARTH', 'FLAME',
     'GRAPE', 'JUICE', 'KNIFE', 'LAUGH', 'MAGIC',
