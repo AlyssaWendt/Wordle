@@ -145,11 +145,13 @@ export class Game {
             console.log('🎉 WIN CONDITION MET!')
             this.state.gameStatus = 'won'  
             alert('Congratulations! You won!')
+            this.reset()
             return
         } else if (this.checkLoseCondition()) {
             console.log('💀 LOSE CONDITION MET!')
             this.state.gameStatus = 'lost'
             alert(`Game Over! The word was ${this.state.targetWord}`)
+            this.reset()
             return
         } 
         
@@ -160,10 +162,6 @@ export class Game {
         console.log('Reset current guess:', this.state.currentGuess) 
         
         console.log('=== END SUBMIT GUESS ===\n')
-    }
-
-    public async startNewGame(): Promise<void> {
-        await this.reset()
     }
 
     // ===== PUBLIC METHODS =====
@@ -271,7 +269,8 @@ export class Game {
           } catch (error) {
             console.error('❌ Error validating word:', error)
             // Fallback to basic validation if API fails
-            return word.length === WORD_LENGTH && /^[A-Z]+$/.test(word)
+            alert('Word validation service unavailable. Please try again.')
+            return false
           }
     }
 
