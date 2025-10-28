@@ -2,16 +2,16 @@
 export type TileStatus = 'correct' | 'present' | 'absent' | 'empty'
 
 export interface TileData {
-  letter: string
-  status: TileStatus
+    letter: string
+    status: TileStatus
 }
 
 // ===== CONSTANTS =====
 export const TILE_STATUSES = {
-  CORRECT: 'correct' as const,
-  PRESENT: 'present' as const,
-  ABSENT: 'absent' as const,
-  EMPTY: 'empty' as const,
+    CORRECT: 'correct' as const,
+    PRESENT: 'present' as const,
+    ABSENT: 'absent' as const,
+    EMPTY: 'empty' as const,
 } as const
 
 // ===== TILE CLASS =====
