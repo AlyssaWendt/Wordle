@@ -46,17 +46,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
         console.log('🤖 Calling OpenAI to validate...')
         const response = await openai.chat.completions.create({
-            model: 'gpt-4o-mini',
+            model: 'gpt-3.5-turbo',
             messages: [{
                 role: 'user',
-                content: `Is "${word.toUpperCase()}" a valid English word that would be acceptable in Wordle? Common English words only, no proper nouns, no abbreviations. Respond with only "YES" or "NO".`
+                content: `"${word.toUpperCase()}" - valid English word? Y/N` // Shorter prompt
             }],
-            max_tokens: 5,
+            max_tokens: 1,
             temperature: 0,
         })
 
         const aiResponse = response.choices[0]?.message?.content?.trim().toUpperCase()
-        const isValid = aiResponse === 'YES'
+        const isValid = aiResponse?.startsWith('Y') // Check for Y/YES
         
         console.log(`✅ OpenAI says "${word}" is:`, aiResponse, '→', isValid)
         
