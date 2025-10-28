@@ -10,7 +10,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   console.log('- API key starts with sk-:', process.env.OPENAI_API_KEY?.startsWith('sk-'))
   console.log('- API key length:', process.env.OPENAI_API_KEY?.length)
 
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
@@ -25,7 +24,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  // Check environment variable first
   if (!process.env.OPENAI_API_KEY) {
     console.error('❌ OPENAI_API_KEY not found in environment')
     return res.status(500).json({ 

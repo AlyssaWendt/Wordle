@@ -30,10 +30,10 @@ export class Game {
             guesses: [],
             gameStatus: 'playing',
             currentRow: 0,
-            targetWord: 'DONUT' // Temporary test word - will come from OpenAI later
+            targetWord: 'DONUT'
         }
 
-        this.initializeTargetWord() // Async call to set target word
+        this.initializeTargetWord()
         this.board = new Board(container)
         this.keyboard = new Keyboard(container, (key) => this.handleKeyPress(key))
         
@@ -74,7 +74,7 @@ export class Game {
     }
 
     public async reset(): Promise<void> {
-        console.log('🔄 Starting new game...')
+        console.log('Starting new game...')
         try {
             const newWord = await generateWordleWord()
             this.state = {
@@ -102,7 +102,7 @@ export class Game {
         }
     }
 
-    public submitGuess(): void {
+    public async submitGuess(): Promise<void> {
         console.log('=== SUBMITTING GUESS ===')
         console.log('Current guess:', this.state.currentGuess)
         console.log('Target word:', this.state.targetWord)
@@ -113,7 +113,7 @@ export class Game {
             return
         }
         
-        if (!this.isValidWord(this.state.currentGuess)) {
+        if (!(await this.isValidWord(this.state.currentGuess))) {
             console.log('❌ Invalid word:', this.state.currentGuess)
             alert('Not a valid word')
             return
@@ -183,7 +183,6 @@ export class Game {
             console.log('Generated target word from OpenAI:', word)
         } catch (error) {
             console.error('Error generating word from OpenAI:', error)
-            // Keep 'DONUT' as fallback
         }
     }
 
@@ -253,9 +252,27 @@ export class Game {
         return result
     }
 
-    private isValidWord(word: string): boolean {
-        // For now, just check length - later connect to word API
-        return word.length === WORD_LENGTH && /^[A-Z]+$/.test(word)
+    private async isValidWord(word: string): Promise<boolean> {
+        try {
+            console.log('Validating word with AI:', word)
+            
+            const response = await fetch('/api/validate', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ word }),
+            })
+
+            const data = await response.json()
+            console.log('Validation result:', data)
+            
+            return data.isValid
+          } catch (error) {
+            console.error('❌ Error validating word:', error)
+            // Fallback to basic validation if API fails
+            return word.length === WORD_LENGTH && /^[A-Z]+$/.test(word)
+          }
     }
 
     private checkWinCondition(): boolean {
