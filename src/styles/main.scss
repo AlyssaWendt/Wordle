@@ -1,50 +1,243 @@
-@use '_variables' as *;
+@use "_variables" as *;
+@use "sass:color";
 
-.board {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-bottom: 20px;
+* {
+    box-sizing: border-box;
 }
 
-.board-row {
-  display: flex;
-  gap: 4px;
-}
-
-.board-tile {
-  width: 60px;
-  height: 60px;
-  border: 2px solid #d3d6da;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 20px;
-  text-transform: uppercase;
-  
-  // Default state
-  &.empty {
+body {
     background-color: $white;
     color: $black;
-  }
-  
-  // Wordle colors
-  &.correct {
-    background-color: $correct;
-    color: $white;
-    border-color: $correct;
-  }
-  
-  &.present {
-    background-color: $present;
-    color: $white;
-    border-color: $present;
-  }
-  
-  &.absent {
-    background-color: $absent;
-    color: $white;
-    border-color: $absent;
-  }
+    font-family: $font-family;
+    margin: 0;
+    padding: 20px;
+}
+
+.game-container {
+    margin: 0 auto;
+    max-width: 500px;
+    text-align: center;
+}
+
+.header {
+    border-block-end: 1px solid $light-gray;
+    margin-block-end: 30px;
+    padding-block-end: 10px;
+    text-align: center;
+
+    .title {
+        font-size: 56px;
+        font-weight: 700;
+        letter-spacing: 0.2em;
+        margin: 0;
+    }
+}
+
+.board {
+    display: flex;
+    flex-direction: column;
+    gap: $board-gap;
+    margin-bottom: 30px;
+    padding: 10px;
+
+    .board-row {
+        display: flex;
+        gap: $tile-gap;
+        justify-content: center;
+
+        .board-tile {
+            align-items: center;
+            border: 2px solid $tile-empty-border;
+            display: flex;
+            font-size: 32px;
+            font-weight: 700;
+            height: $tile-size;
+            justify-content: center;
+            line-height: 1;
+            text-transform: uppercase;
+            transition: all 0.2s ease-in-out;
+            user-select: none;
+            width: $tile-size;
+
+            // Default state
+            &.empty {
+                background-color: $white;
+                border-color: $tile-empty-border;
+                color: $black;
+            }
+
+            // Filled but not submitted
+            &.filled {
+                animation: pop $pop-duration ease-in-out;
+                background-color: $white;
+                border-color: $tile-filled-border;
+                color: $black;
+            }
+
+            // Wordle evaluation colors with flip animation
+            &.correct {
+                animation: flip $flip-duration ease-in-out;
+                background-color: $correct;
+                border-color: $correct;
+                color: $white;
+            }
+
+            &.present {
+                animation: flip $flip-duration ease-in-out;
+                background-color: $present;
+                border-color: $present;
+                color: $white;
+            }
+
+            &.absent {
+                animation: flip $flip-duration ease-in-out;
+                background-color: $absent;
+                border-color: $absent;
+                color: $white;
+            }
+
+            // Invalid word shake animation
+            &.invalid {
+                animation: shake 0.5s ease-in-out;
+            }
+        }
+    }
+}
+
+.keyboard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-block-start: 30px;
+}
+
+.keyboard-row {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+
+    .keyboard-key {
+        min-width: 43px;
+        height: 58px;
+        border: none;
+        border-radius: 4px;
+        background-color: $light-gray;
+        color: $black;
+        font-family: inherit;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        user-select: none;
+        transition: all 0.1s ease-in-out;
+
+        &:hover {
+            background-color: color.adjust($light-gray, $lightness: -10%);
+        }
+
+        &:active {
+            transform: scale(0.95);
+        }
+
+        &.key-enter,
+        &.key-backspace {
+            min-width: 65px;
+            font-size: 12px;
+        }
+
+        // Key states based on guesses
+        &.correct {
+            background-color: $correct;
+            color: $white;
+        }
+
+        &.present {
+            background-color: $present;
+            color: $white;
+        }
+
+        &.absent {
+            background-color: $absent;
+            color: $white;
+        }
+    }
+}
+
+// Animations
+@keyframes flip {
+    0% {
+        transform: rotateX(0);
+    }
+    50% {
+        transform: rotateX(-90deg);
+    }
+    100% {
+        transform: rotateX(0);
+    }
+}
+
+@keyframes pop {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes shake {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-2px);
+    }
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(2px);
+    }
+}
+
+// Game states
+.game-complete {
+    .board-tile {
+        animation: none; // Stop animations when game is over
+    }
+}
+
+@media (max-width: 480px) {
+
+    .header .title {
+        font-size: 42px;
+    }
+
+    .board .board-row .board-tile {
+        width: 42px;
+        height: 52px;
+        font-size: 28px;
+    }
+
+    .keyboard-row .keyboard-key {
+        min-width: 25px;
+        height: 50px;
+        font-size: 11px;
+
+        &.key-enter,
+        &.key-backspace {
+            min-width: 55px;
+        }
+    }
 }

@@ -1,7 +1,25 @@
-
+// Colors
 $white: #ffffff;
-$black: #000000;
+$black: #121213;
+$light-gray: #d3d6da;
+$dark-gray: #878a8c;
 $absent: #787c7e;
 $present: #c9b458;
 $correct: #6aaa64;
-  
+
+// Tile states
+$tile-empty-border: #d3d6da;
+$tile-filled-border: #878a8c;
+
+// Typography
+$font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+
+// Spacing
+$tile-size: 62px;
+$tile-gap: 5px;
+$board-gap: 6px;
+
+// Animation
+$flip-duration: 0.6s;
+$pop-duration: 0.1s;
+
