@@ -77,23 +77,45 @@ body {
             // Wordle evaluation colors with flip animation
             &.correct {
                 animation: flip $flip-duration ease-in-out;
+                animation-fill-mode: both;
                 background-color: $correct;
                 border-color: $correct;
                 color: $white;
+
+                // Ripple delays for each column
+                &[data-col="0"] { animation-delay: 0ms; }
+                &[data-col="1"] { animation-delay: 150ms; }
+                &[data-col="2"] { animation-delay: 300ms; }
+                &[data-col="3"] { animation-delay: 450ms; }
+                &[data-col="4"] { animation-delay: 600ms; }
             }
 
             &.present {
                 animation: flip $flip-duration ease-in-out;
+                animation-fill-mode: both;
                 background-color: $present;
                 border-color: $present;
                 color: $white;
+
+                &[data-col="0"] { animation-delay: 0ms; }
+                &[data-col="1"] { animation-delay: 150ms; }
+                &[data-col="2"] { animation-delay: 300ms; }
+                &[data-col="3"] { animation-delay: 450ms; }
+                &[data-col="4"] { animation-delay: 600ms; }
             }
 
             &.absent {
                 animation: flip $flip-duration ease-in-out;
+                animation-fill-mode: both;
                 background-color: $absent;
                 border-color: $absent;
                 color: $white;
+
+                &[data-col="0"] { animation-delay: 0ms; }
+                &[data-col="1"] { animation-delay: 150ms; }
+                &[data-col="2"] { animation-delay: 300ms; }
+                &[data-col="3"] { animation-delay: 450ms; }
+                &[data-col="4"] { animation-delay: 600ms; }
             }
 
             // Invalid word shake animation
@@ -169,9 +191,15 @@ body {
 // Animations
 @keyframes flip {
     0% {
+        background-color: $white;
+        border-color: $tile-filled-border;   
+        color: $black;
         transform: rotateX(0);
     }
     50% {
+        background-color: $white;
+        border-color: $tile-filled-border;
+        color: $black;
         transform: rotateX(-90deg);
     }
     100% {
