@@ -52,11 +52,11 @@ export class Game {
             this.addLetter(normalizedKey)
             return
         }
-        if (key === 'Enter') {
+        if (key === 'Enter' || key === 'ENTER') {
             this.submitGuess()
             return
         }
-        if (key === 'Backspace') {
+        if (key === 'Backspace' || key === 'BACKSPACE') {
             this.removeLetter()
             return
         }

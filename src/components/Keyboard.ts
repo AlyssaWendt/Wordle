@@ -68,8 +68,12 @@ export class Keyboard {
     private getKeyClassName(key: string): string {
         const baseClass = 'keyboard-key'
         
-        if (key === 'ENTER' || key === 'BACKSPACE') {
-            return `${baseClass} ${baseClass}--special`
+        if (key === 'ENTER') {
+            return `${baseClass} key-enter`
+        }
+        
+        if (key === 'BACKSPACE') {
+            return `${baseClass} key-backspace`
         }
         
         return baseClass
