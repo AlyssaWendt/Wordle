@@ -1,5 +1,6 @@
 import { Board } from './Board'
 import { Keyboard } from './Keyboard'
+import { Message } from './Message'
 import type { TileData, TileStatus } from './Tile'
 import { generateWordleWord } from '../utils/wordGenerator'
 
@@ -23,6 +24,7 @@ export class Game {
     private state: GameState
     private board: Board
     private keyboard: Keyboard
+    private message: Message
 
     constructor(container: HTMLElement) {
         this.state = {
@@ -36,6 +38,7 @@ export class Game {
         this.initializeTargetWord()
         this.board = new Board(container)
         this.keyboard = new Keyboard(container, (key) => this.handleKeyPress(key))
+        this.message = new Message(container)
         
         window.addEventListener('keydown', (e) => this.handleKeyPress(e.key))
         
@@ -78,6 +81,7 @@ export class Game {
                 currentRow: 0,
                 targetWord: newWord
             }
+            
             this.board.reset()
             this.keyboard.reset()
         } catch (error) {
@@ -101,7 +105,7 @@ export class Game {
         }
         
         if (!(await this.isValidWord(this.state.currentGuess))) {
-            alert('Not a valid word')
+            this.message.error('Not a valid word')
             return
         }
 
@@ -118,13 +122,13 @@ export class Game {
         this.updateKeyboard()
         if (this.checkWinCondition()) {
             this.state.gameStatus = 'won'  
-            alert('Congratulations! You won!')
-            this.reset()
+            this.message.success('Congratulations! You won!')
+            setTimeout(() => this.reset(), 2500)
             return
         } else if (this.checkLoseCondition()) {
             this.state.gameStatus = 'lost'
-            alert(`Game Over! The word was ${this.state.targetWord}`)
-            this.reset()
+            this.message.error(`Game Over! The word was ${this.state.targetWord}`)
+            setTimeout(() => this.reset(), 3500)
             return
         } 
         this.state.currentRow++
@@ -206,7 +210,7 @@ export class Game {
           } catch (error) {
             console.error('❌ Error validating word:', error)
             // Fallback to basic validation if API fails
-            alert('Word validation service unavailable. Please try again.')
+            this.message.error('Word validation service unavailable. Please try again.')
             return false
           }
     }
