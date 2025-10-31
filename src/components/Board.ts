@@ -109,8 +109,15 @@ export class Board {
         }
     }
 
-    // Future methods:
-    // public animateRow(row: number): void
-    // public shakeRow(row: number): void
-    // public highlightTile(row: number, col: number): void
+    public shakeRow(row: number): void {
+        const rowElement = this.container.querySelector(`[data-row="${row}"]`)?.parentElement
+        if (!rowElement) return
+        
+        const tiles = rowElement.querySelectorAll('.board-tile')
+        tiles.forEach(tile => tile.classList.add('invalid'))
+
+        setTimeout(() => {
+            tiles.forEach(tile => tile.classList.remove('invalid'))
+        }, 500)
+    }
 }

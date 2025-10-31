@@ -101,11 +101,14 @@ export class Game {
 
     public async submitGuess(): Promise<void> {
         if (this.state.currentGuess.length !== WORD_LENGTH) {
+            this.message.error('Not enough letters')
+            this.board.shakeRow(this.state.currentRow)
             return
         }
         
         if (!(await this.isValidWord(this.state.currentGuess))) {
-            this.message.error('Not a valid word')
+            this.message.error('Not in word list')
+            this.board.shakeRow(this.state.currentRow)
             return
         }
 
