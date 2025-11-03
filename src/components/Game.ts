@@ -25,6 +25,7 @@ export class Game {
     private board: Board
     private keyboard: Keyboard
     private message: Message
+    private nextApiWord?: string
 
     constructor(container: HTMLElement) {
         this.state = {
@@ -32,10 +33,9 @@ export class Game {
             guesses: [],
             gameStatus: 'playing',
             currentRow: 0,
-            targetWord: 'DONUT'
+            targetWord: this.getInstantWord()
         }
 
-        this.initializeTargetWord()
         this.board = new Board(container)
         this.keyboard = new Keyboard(container, (key) => this.handleKeyPress(key))
         this.message = new Message(container)
@@ -43,9 +43,8 @@ export class Game {
         window.addEventListener('keydown', (e) => this.handleKeyPress(e.key))
         
         this.updateBoard()
+        this.preloadApiWord()
     }
-
-
 
     public handleKeyPress(key: string): void {
         if (this.state.gameStatus !== 'playing') return
@@ -71,32 +70,25 @@ export class Game {
         this.updateBoard()
     }
 
-    public async reset(): Promise<void> {
-        try {
-            const newWord = await generateWordleWord()
-            this.state = {
-                currentGuess: '',
-                guesses: [],
-                gameStatus: 'playing',
-                currentRow: 0,
-                targetWord: newWord
-            }
-            
-            this.board.reset()
-            this.keyboard.reset()
-        } catch (error) {
-            // Reset with fallback word
-            this.state = {
-                currentGuess: '',
-                guesses: [],
-                gameStatus: 'playing',
-                currentRow: 0,
-                targetWord: 'DONUT'
-            }
-            
-            this.board.reset()
-            this.keyboard.reset()
+    public reset(): void {
+        const newWord = this.nextApiWord || this.getInstantWord()
+        this.state = {
+            currentGuess: '',
+            guesses: [],
+            gameStatus: 'playing',
+            currentRow: 0,
+            targetWord: newWord
         }
+        
+        if (this.nextApiWord) {
+            this.nextApiWord = undefined
+            this.preloadApiWord()
+        }
+
+        this.message.reset()
+        this.board.reset()
+        this.keyboard.reset()
+        this.updateBoard() 
     }
 
     public async submitGuess(): Promise<void> {
@@ -142,18 +134,28 @@ export class Game {
     public addLetter(letter: string): void {
         if (this.state.currentGuess.length >= WORD_LENGTH) return
         if (this.state.gameStatus !== 'playing') return
+        if (!/^[A-Z]$/i.test(letter)) return 
         
         this.state.currentGuess += letter.toUpperCase()
         this.board.renderCurrentGuess(this.state.currentGuess, this.state.currentRow)
     }
 
     // ===== PRIVATE METHODS =====
-    private async initializeTargetWord(): Promise<void> {
+    private getInstantWord(): string {
+        //  Wordle words for instant start
+        const excellentStarters = [
+            'SLATE', 'CRANE', 'ARISE', 'RAISE', 'ROATE', 
+            'DONUT', 'OILED', 'AUDIO', 'HOUSE', 'PLANT'
+        ]
+        return excellentStarters[Math.floor(Math.random() * excellentStarters.length)]
+    }
+
+    private async preloadApiWord(): Promise<void> {
         try {
             const word = await generateWordleWord()
-            this.state.targetWord = word
+            this.nextApiWord = word
         } catch (error) {
-            console.error('Error generating word from OpenAI:', error)
+            console.log('⚡ Using curated words - still excellent quality')
         }
     }
 

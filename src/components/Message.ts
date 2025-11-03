@@ -7,6 +7,7 @@ export interface MessageData {
     persistent?: boolean // if true, message won't auto-dismiss
 }
 
+// ===== MESSAGE CLASS =====
 export class Message {
     private container: HTMLElement
     private currentMessage: HTMLElement | null = null
@@ -16,22 +17,11 @@ export class Message {
         parentElement.appendChild(this.container)
     }
 
+    // ===== PRIVATE SETUP METHODS =====
     private createContainer(): HTMLElement {
         const container = document.createElement('div')
         container.className = 'message-container'
         return container
-    }
-
-    public show(config: MessageData): void {
-        // If a message is already displayed, hide it first
-        this.reset()
-        this.currentMessage = this.createMessageElement(config)
-        this.container.appendChild(this.currentMessage)
-        if (config.duration && !config.persistent) {
-            setTimeout(() => {
-                this.reset()
-            }, config.duration)
-        }
     }
 
     private createMessageElement(config: MessageData): HTMLElement {
@@ -41,7 +31,8 @@ export class Message {
         return messageEl
     }
 
-    private reset(): void {
+    // ===== PRIVATE UTILITY METHODS =====
+    private hide(): void {
         if (!this.currentMessage) return
 
         this.currentMessage.style.animation = 'slide-out 0.3s ease-in'
@@ -54,7 +45,24 @@ export class Message {
         }, 300)
     }
 
-    // Helper methods
+    // ===== PUBLIC METHODS =====
+    public show(config: MessageData): void {
+        // If a message is already displayed, hide it first
+        this.hide()
+        this.currentMessage = this.createMessageElement(config)
+        this.container.appendChild(this.currentMessage)
+        if (config.duration && !config.persistent) {
+            setTimeout(() => {
+                this.hide()
+            }, config.duration)
+        }
+    }
+
+    public reset(): void {
+        this.hide()
+    }
+
+    // ===== HELPER METHODS =====
     public success(text: string, duration = 2000): void {
         this.show({ text, type: 'success', duration })
     }
@@ -70,5 +78,4 @@ export class Message {
     public warning(text: string, duration = 2000): void {
         this.show({ text, type: 'warning', duration })
     }
-
 }
