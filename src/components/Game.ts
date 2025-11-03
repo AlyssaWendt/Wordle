@@ -224,10 +224,4 @@ export class Game {
     private checkLoseCondition(): boolean {
         return this.state.currentRow >= MAX_GUESSES - 1
     }
-
-    // ✅ Fallback to starters if API fails
-    private getRandomStarter(): string {
-        const starters = ['SLATE', 'CRANE', 'ARISE', 'RAISE', 'AUDIO']
-        return starters[Math.floor(Math.random() * starters.length)]
-    }
 }
