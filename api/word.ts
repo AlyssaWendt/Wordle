@@ -7,7 +7,6 @@ const FALLBACK_WORDS = [
     'AUDIO', 'HOUSE', 'PLANT', 'LIGHT', 'SOUND'
 ]
 
-const API_TIMEOUT = 3000
 const MAX_TOKENS = 5
 
 // ===== HELPER FUNCTIONS =====
@@ -87,25 +86,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             apiKey: process.env.OPENAI_API_KEY,
         })
 
-        // ✅ Add timeout to prevent hanging
-        const timeoutPromise = new Promise<never>((_, reject) => 
-            setTimeout(() => reject(new Error('API_TIMEOUT')), API_TIMEOUT)
-        )
-
-        const openaiPromise = openai.chat.completions.create({
+        const response = await openai.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: [{
                 role: 'user',
                 content: 'One 5-letter word for Wordle:'
             }],
-            max_tokens: MAX_TOKENS,
+            max_tokens: 5,
             temperature: 1,
         })
-
-        const response = await Promise.race([openaiPromise, timeoutPromise])
+        
         const word = response.choices[0]?.message?.content?.trim().toUpperCase()
 
-        if (word && isValidWordFormat(word) && isValidWordleWord(word)) {
+        if (!word) {
+            console.warn('⚠️ No word received from API')
+            return res.status(200).json(createSuccessResponse(
+                getRandomFallbackWord(), 
+                true
+            ))
+        }
+
+        if (isValidWordFormat(word) && isValidWordleWord(word)) {
+            console.log('✅ Generated word:', word)
             return res.status(200).json(createSuccessResponse(word))
         } else {
             console.warn('⚠️ Invalid word format from API:', word)
@@ -117,12 +119,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     } catch (error) {
         const err = error instanceof Error ? error : new Error(String(error))
+        console.error('❌ OpenAI API error:', err.message)
         
-        if (err.message === 'API_TIMEOUT') {
-            console.warn('⏰ OpenAI API timeout, using fallback')
-        } else {
-            console.error('❌ OpenAI API error:', err.message)
-        }
         return res.status(200).json(createSuccessResponse(
             getRandomFallbackWord(), 
             true
