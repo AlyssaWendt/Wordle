@@ -37,17 +37,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         })
         
         const rawResponse = response.choices[0]?.message?.content
-        console.log('🤖 OpenAI raw response:', JSON.stringify(rawResponse))
-
         const word = rawResponse?.trim().toUpperCase()
-        console.log('🔤 Processed word:', word)
 
         // Simple validation since prompt should ensure clean response
         if (word && word.length === 5 && /^[A-Z]+$/.test(word)) {
-            console.log('✅ Clean OpenAI word:', word)
             return res.status(200).json({ word, source: 'openai' })
         } else {
-            console.log('❌ Invalid response format')
             return res.status(422).json({ 
                 error: 'Invalid word generated',
                 debug: { rawResponse, word }

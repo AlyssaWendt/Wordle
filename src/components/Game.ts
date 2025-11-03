@@ -81,10 +81,7 @@ export class Game {
     }
 
     public reset(): void {
-        // ✅ Use the preloaded word
         const newWord = this.nextApiWord!
-        
-        console.log('🎯 Reset using:', newWord)
         
         this.state = {
             currentGuess: '',
@@ -93,12 +90,8 @@ export class Game {
             currentRow: 0,
             targetWord: newWord
         }
-
-        // ✅ Start preloading BEFORE clearing
-        this.preloadApiWord().then(() => {
-            // Only clear the old word after new one is loading
-            console.log('✅ New word preloading started')
-        })
+        
+        this.preloadApiWord().then(() => {})
         
         this.message.reset()
         this.board.reset()
