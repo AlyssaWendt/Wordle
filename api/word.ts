@@ -74,11 +74,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (!process.env.OPENAI_API_KEY) {
-        console.error('❌ OPENAI_API_KEY not found in environment')
-        return res.status(200).json(createSuccessResponse(
-            getRandomFallbackWord(), 
-            true
-        ))
+        console.log('❌ No API key - returning fallback') // Are you seeing this?
+        return res.status(200).json({
+            word: getRandomFallbackWord(),
+            success: true,
+            fallback: true
+        })
     }
 
     try {
@@ -127,3 +128,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ))
     }
 }
+
+// Test fetch code - to be removed in production
+fetch('/api/word', { method: 'POST', headers: { 'Content-Type': 'application/json' }})
+  .then(r => r.json())
+  .then(data => {
+    console.log('🔍 Direct API test result:', data)
+    if (data.fallback) {
+      console.log('❌ API is returning fallback words - check API key')
+    } else {
+      console.log('✅ API is working - check game logic')
+    }
+  })

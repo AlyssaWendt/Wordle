@@ -71,7 +71,9 @@ export class Game {
     }
 
     public reset(): void {
+        console.log('🔄 Reset called, nextApiWord:', this.nextApiWord)
         const newWord = this.nextApiWord || this.getInstantWord()
+        console.log('🎯 Using word:', newWord, 'from:', this.nextApiWord ? 'API' : 'fallback')
         this.state = {
             currentGuess: '',
             guesses: [],
@@ -151,11 +153,14 @@ export class Game {
     }
 
     private async preloadApiWord(): Promise<void> {
+        console.log('🔄 Starting preloadApiWord...')
         try {
             const word = await generateWordleWord()
+            console.log('✅ Preload got word:', word, typeof word)
             this.nextApiWord = word
+            console.log('💾 Stored nextApiWord:', this.nextApiWord)
         } catch (error) {
-            console.log('⚡ Using curated words - still excellent quality')
+            console.log('❌ Preload failed:', error)
         }
     }
 
