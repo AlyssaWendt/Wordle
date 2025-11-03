@@ -28,9 +28,8 @@ function init(): void {
     throw new Error('Game container not found')
   }
 
-  const game = new Game(gameContainer)
-  
-  console.log('Wordle game initialized!', { game })
+  new Game(gameContainer)
+
 }
 
 // ===== APP STARTUP =====
