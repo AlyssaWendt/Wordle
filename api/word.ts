@@ -29,12 +29,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             temperature: 1,
         })
         
-        const word = response.choices[0]?.message?.content?.trim().toUpperCase()
+        // ✅ Add these debug logs
+        const rawResponse = response.choices[0]?.message?.content
+        console.log('🤖 OpenAI raw response:', JSON.stringify(rawResponse))
+        console.log('🤖 Raw response length:', rawResponse?.length)
+
+        const word = rawResponse?.trim().toUpperCase()
+        console.log('🔤 Processed word:', JSON.stringify(word))
+        console.log('🔤 Word length:', word?.length)
+        console.log('🔤 Regex test:', word ? /^[A-Z]+$/.test(word) : false)
 
         if (word && word.length === 5 && /^[A-Z]+$/.test(word)) {
-            return res.status(200).json({ word })
+            console.log('✅ Validation passed, returning:', word)
+            return res.status(200).json({ word, source: 'openai' })
         } else {
-            return res.status(422).json({ error: 'Invalid word generated' })
+            console.log('❌ Validation failed!')
+            console.log('❌ Word exists:', !!word)
+            console.log('❌ Length is 5:', word?.length === 5)
+            console.log('❌ Regex passes:', word ? /^[A-Z]+$/.test(word) : false)
+            return res.status(422).json({ 
+                error: 'Invalid word generated',
+                debug: { rawResponse, word, length: word?.length }
+            })
         }
 
     } catch (error) {
