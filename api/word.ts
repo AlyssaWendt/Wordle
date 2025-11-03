@@ -1,19 +1,6 @@
 import OpenAI from 'openai'
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-// ===== CONSTANTS =====
-const FALLBACK_WORDS = [
-    'SLATE', 'CRANE', 'ARISE', 'RAISE', 'DONUT', 
-    'AUDIO', 'HOUSE', 'PLANT', 'LIGHT', 'SOUND'
-]
-
-// ===== HELPER FUNCTIONS =====
-function getRandomFallbackWord(): string {
-    return FALLBACK_WORDS[Math.floor(Math.random() * FALLBACK_WORDS.length)]
-}
-
-
-// ===== MAIN HANDLER =====
 export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Access-Control-Allow-Origin', '*')
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -24,10 +11,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (!process.env.OPENAI_API_KEY) {
-        return res.status(200).json({ 
-            word: getRandomFallbackWord(),
-            fallback: true 
-        })
+        return res.status(500).json({ error: 'API key not configured' })
     }
 
     try {
@@ -50,17 +34,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (word && word.length === 5 && /^[A-Z]+$/.test(word)) {
             return res.status(200).json({ word })
         } else {
-            return res.status(200).json({ 
-                word: getRandomFallbackWord(),
-                fallback: true 
-            })
+            return res.status(422).json({ error: 'Invalid word generated' })
         }
 
     } catch (error) {
         console.error('OpenAI API error:', error)
-        return res.status(200).json({ 
-            word: getRandomFallbackWord(),
-            fallback: true 
-        })
+        return res.status(500).json({ error: 'OpenAI service unavailable' })
     }
 }

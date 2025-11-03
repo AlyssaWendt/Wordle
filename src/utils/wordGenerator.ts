@@ -30,15 +30,12 @@ export async function generateWordleWord(): Promise<string> {
     }
 }
 
+// ✅ Keep your existing fallback words - they work fine
+const fallbackWords = [
+    'SLATE', 'CRANE', 'ARISE', 'RAISE', 'AUDIO', 'DONUT', 'HOUSE', 
+    'PLANT', 'LIGHT', 'SOUND', 'ABORT', 'BREAD', 'CHAIR', 'DANCE'
+]
+
 function getRandomFallbackWord(): string {
-    const fallbackWords = [
-        'SLATE', 'CRANE', 'ABORT', 'AUDIO', 'HOUSE', 
-        'MOUSE', 'PLANT', 'BREAD', 'CHAIR', 'DANCE',
-        'LIGHT', 'SOUND', 'WATER', 'EARTH', 'FLAME',
-        'GRAPE', 'JUICE', 'KNIFE', 'LAUGH', 'MAGIC',
-        'NURSE', 'OCEAN', 'PIANO', 'QUEEN', 'RADIO'
-    ]
-  
-  const randomWord = fallbackWords[Math.floor(Math.random() * fallbackWords.length)]
-  return randomWord
+    return fallbackWords[Math.floor(Math.random() * fallbackWords.length)]
 }

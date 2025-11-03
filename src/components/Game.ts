@@ -28,12 +28,16 @@ export class Game {
     private nextApiWord?: string
 
     constructor(container: HTMLElement) {
+        // ✅ Curated excellent starter words - instant + variety
+        const starterWords = ['SLATE', 'CRANE', 'ARISE', 'RAISE', 'AUDIO']
+        const randomStarter = starterWords[Math.floor(Math.random() * starterWords.length)]
+        
         this.state = {
             currentGuess: '',
             guesses: [],
             gameStatus: 'playing',
             currentRow: 0,
-            targetWord: this.getInstantWord()
+            targetWord: randomStarter  // ✅ Random excellent starter
         }
 
         this.board = new Board(container)
@@ -43,7 +47,13 @@ export class Game {
         window.addEventListener('keydown', (e) => this.handleKeyPress(e.key))
         
         this.updateBoard()
-        this.preloadApiWord()
+        this.preloadApiWord() // ✅ Queue API word for NEXT game
+    }
+
+    // ✅ Simple preload for next game
+    private async preloadApiWord(): Promise<void> {
+        const word = await generateWordleWord()
+        this.nextApiWord = word
     }
 
     public handleKeyPress(key: string): void {
@@ -71,9 +81,11 @@ export class Game {
     }
 
     public reset(): void {
-        console.log('🔄 Reset called, nextApiWord:', this.nextApiWord)
-        const newWord = this.nextApiWord || this.getInstantWord()
-        console.log('🎯 Using word:', newWord, 'from:', this.nextApiWord ? 'API' : 'fallback')
+        // ✅ Use the preloaded word
+        const newWord = this.nextApiWord!
+        
+        console.log('🎯 Reset using:', newWord)
+        
         this.state = {
             currentGuess: '',
             guesses: [],
@@ -81,16 +93,17 @@ export class Game {
             currentRow: 0,
             targetWord: newWord
         }
-        
-        if (this.nextApiWord) {
-            this.nextApiWord = undefined
-            this.preloadApiWord()
-        }
 
+        // ✅ Start preloading BEFORE clearing
+        this.preloadApiWord().then(() => {
+            // Only clear the old word after new one is loading
+            console.log('✅ New word preloading started')
+        })
+        
         this.message.reset()
         this.board.reset()
         this.keyboard.reset()
-        this.updateBoard() 
+        this.updateBoard()
     }
 
     public async submitGuess(): Promise<void> {
@@ -143,27 +156,6 @@ export class Game {
     }
 
     // ===== PRIVATE METHODS =====
-    private getInstantWord(): string {
-        //  Wordle words for instant start
-        const excellentStarters = [
-            'SLATE', 'CRANE', 'ARISE', 'RAISE', 'ROATE', 
-            'DONUT', 'OILED', 'AUDIO', 'HOUSE', 'PLANT'
-        ]
-        return excellentStarters[Math.floor(Math.random() * excellentStarters.length)]
-    }
-
-    private async preloadApiWord(): Promise<void> {
-        console.log('🔄 Starting preloadApiWord...')
-        try {
-            const word = await generateWordleWord()
-            console.log('✅ Preload got word:', word, typeof word)
-            this.nextApiWord = word
-            console.log('💾 Stored nextApiWord:', this.nextApiWord)
-        } catch (error) {
-            console.log('❌ Preload failed:', error)
-        }
-    }
-
     private updateBoard(): void {
         this.board.render(
             this.state.guesses, 
@@ -209,20 +201,16 @@ export class Game {
     private async isValidWord(word: string): Promise<boolean> {
         try {
             const response = await fetch('/api/validate', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({ word }),
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ word }),
             })
+            
             const data = await response.json()
             return data.isValid
-          } catch (error) {
-            console.error('❌ Error validating word:', error)
-            // Fallback to basic validation if API fails
-            this.message.error('Word validation service unavailable. Please try again.')
-            return false
-          }
+        } catch (error) {
+            return word.length === 5 && /^[A-Z]+$/i.test(word)
+        }
     }
 
     private checkWinCondition(): boolean {
@@ -237,4 +225,9 @@ export class Game {
         return this.state.currentRow >= MAX_GUESSES - 1
     }
 
+    // ✅ Fallback to starters if API fails
+    private getRandomStarter(): string {
+        const starters = ['SLATE', 'CRANE', 'ARISE', 'RAISE', 'AUDIO']
+        return starters[Math.floor(Math.random() * starters.length)]
+    }
 }
