@@ -10,7 +10,6 @@ const fallbackWords = [
 function getRandomFallbackWord(): string {
     const availableWords = fallbackWords.filter(word => !usedWords.has(word))
     
-    // Reset if all fallback words used
     if (availableWords.length === 0) {
         usedWords.clear()
         return fallbackWords[Math.floor(Math.random() * fallbackWords.length)]
@@ -30,25 +29,25 @@ export async function generateWordleWord(): Promise<string> {
         })
 
         const data = await response.json()
-        console.log('📦 Response data:', data)
 
         if (response.ok && data.source === 'openai') {
-            // Check if OpenAI word was already used
             if (usedWords.has(data.word)) {
                 return getRandomFallbackWord()
             }
+            
             usedWords.add(data.word)
             return data.word
         } else {
             return getRandomFallbackWord()
         }
     } catch (error) {
-        console.error('❌ Error fetching word from API:', error)
+        if (process.env.NODE_ENV === 'development') {
+            console.error('Error fetching word from API:', error)
+        }
         return getRandomFallbackWord()
     }
 }
 
-// Export function to reset session if needed
 export function resetWordSession(): void {
     usedWords.clear()
 }
