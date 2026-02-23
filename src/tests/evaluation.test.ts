@@ -39,7 +39,7 @@ describe('Word Evaluation Logic', () => {
     // HOUSE vs CRANE: 
     // C-absent, R-absent, A-absent, N-absent, E-CORRECT (position 4 matches)
     const result = evaluateGuess('HOUSE', 'CRANE')
-    expect(result).toEqual(['absent', 'absent', 'absent', 'absent', 'correct']) // ✅ E is correct, not present
+    expect(result).toEqual(['absent', 'absent', 'absent', 'absent', 'correct'])
   })
 
   it('should mark correct letters in wrong positions as present', () => {
@@ -60,7 +60,7 @@ describe('Word Evaluation Logic', () => {
     // S-present (S exists in SPEED but not position 3)
     // E-present (second E, exists in SPEED)
     const result = evaluateGuess('SPEED', 'ERASE')
-    expect(result).toEqual(['present', 'absent', 'absent', 'present', 'present']) // ✅ S is present, not absent
+    expect(result).toEqual(['present', 'absent', 'absent', 'present', 'present']) 
   })
 
   it('should handle no matches', () => {

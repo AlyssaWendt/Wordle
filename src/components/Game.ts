@@ -28,7 +28,7 @@ export class Game {
     private nextApiWord?: string
 
     constructor(container: HTMLElement) {
-        // ✅ Curated excellent starter words - instant + variety
+        // Curated excellent starter words - instant + variety
         const starterWords = ['SLATE', 'CRANE', 'ARISE', 'RAISE', 'AUDIO']
         const randomStarter = starterWords[Math.floor(Math.random() * starterWords.length)]
         
@@ -37,7 +37,7 @@ export class Game {
             guesses: [],
             gameStatus: 'playing',
             currentRow: 0,
-            targetWord: randomStarter  // ✅ Random excellent starter
+            targetWord: randomStarter
         }
 
         this.board = new Board(container)
@@ -47,10 +47,10 @@ export class Game {
         window.addEventListener('keydown', (e) => this.handleKeyPress(e.key))
         
         this.updateBoard()
-        this.preloadApiWord() // ✅ Queue API word for NEXT game
+        this.preloadApiWord()
     }
 
-    // ✅ Simple preload for next game
+    // Preload for next game
     private async preloadApiWord(): Promise<void> {
         const word = await generateWordleWord()
         this.nextApiWord = word
