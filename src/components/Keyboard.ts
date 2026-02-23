@@ -156,9 +156,4 @@ export class Keyboard {
             keyElement.classList.add(status)
         }
     }
-
-    // Future methods:
-    // public disableKey(key: string): void
-    // public enableKey(key: string): void  
-    // public animateKeyPress(key: string): void
 }

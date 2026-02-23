@@ -61,9 +61,4 @@ export class Tile {
     isCorrect(): boolean {
         return this.data.status === 'correct'
     }
-
-    // Future instance methods:
-    // validate(): boolean
-    // animate(): void  
-    // clone(): Tile
 }
